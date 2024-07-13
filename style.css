@@ -1,0 +1,20 @@
+ /* Custom styles for the color scheme */
+ body {
+    background-color: rgb(234, 234, 234);
+    color: rgb(0, 0, 0);
+  }
+  .navbar {
+    background-color: rgb(0, 0, 0);
+  }
+  .navbar-dark .navbar-nav .nav-link {
+    color: rgb(20, 112, 175); 
+  }
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: rgb(142, 182, 220); 
+  }
+  .jumbotron {
+    background-color: rgb(234, 234, 234);
+  }
+  .jumbotron h1, .jumbotron p {
+    color: rgb(20, 112, 175);
+  }
