@@ -93,6 +93,7 @@
 
   <script>
     let correctAnswers = {}; // Store correct answers here
+    let mathFieldMap = new Map(); // Map to store MathQuill instances
 
     document.getElementById('file').onchange = function() {
       var file = this.files[0];
@@ -216,8 +217,6 @@
     }
 
     function generateAnswerHTML(answerField, variables, uniqueQuestionId) {
-      if (!answerField) return '';
-
       var typeIndex = answerField.indexOf('type:');
       var typeValue = answerField.substring(typeIndex + 5).trim();
 
@@ -229,10 +228,9 @@
         var optionsString = typeValue.substring(optionsStartIndex, optionsEndIndex);
         var options = optionsString.split(',').map(option => evaluateAndSimplifyExpression(option.trim(), variables));
 
-        // Check if randomization is requested
         var randomizeIndex = typeValue.indexOf('randomize=true');
         if (randomizeIndex !== -1) {
-          options = shuffleArray(options); // Assuming shuffleArray function is defined
+          options = shuffleArray(options);
         }
 
         var choicesHTML = options.map(option => '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>').join('<br>');
@@ -241,7 +239,6 @@
       return '';
     }
 
-    // Function to shuffle array elements (Fisher-Yates shuffle)
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -270,15 +267,14 @@
           spaceBehavesLikeTab: true,
           handlers: {
             edit: function() {
-              var enteredMath = field.latex();
+              var enteredMath = mathField.latex();
               console.log('Current LaTeX: ' + enteredMath);
             }
           }
         });
-        field.dataset.mathquillField = mathField;
+        mathFieldMap.set(field.id, mathField); // Store MathQuill instance in Map
       });
 
-      // Add click event listeners to check buttons for multiple-choice questions
       document.querySelectorAll('button[id^="check-button-"]').forEach(function(button) {
         button.addEventListener('click', function() {
           var uniqueQuestionId = this.id.split('-').slice(2).join('-');
@@ -291,10 +287,7 @@
       var answerType = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]') ? 'multiple-choice' : 'short-answer';
 
       if (answerType === 'multiple-choice') {
-        // Get the correct answer for this question
         var correctAnswer = correctAnswers[uniqueQuestionId];
-
-        // Get the selected answer
         var selectedAnswer = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]:checked');
 
         if (selectedAnswer) {
@@ -308,19 +301,29 @@
           alert('Please select an answer.');
         }
       } else if (answerType === 'short-answer') {
-        // Get the correct answer for this question
         var correctAnswer = correctAnswers[uniqueQuestionId];
+        var mathField = mathFieldMap.get('answer-' + uniqueQuestionId); // Retrieve MathQuill instance from Map
 
-        // Get the MathQuill field
-        var mathField = document.querySelector('#answer-' + uniqueQuestionId).dataset.mathquillField;
+        if (mathField) {
+          console.log('mathField:', mathField); // Debugging line
+          console.log('typeof mathField:', typeof mathField); // Debugging line
 
-        // Get the entered answer
-        var enteredAnswer = mathField.latex();
+          var enteredAnswer;
+          try {
+            enteredAnswer = mathField.latex();
+          } catch (error) {
+            console.error('Error accessing latex method:', error);
+            alert('Error accessing the answer field.');
+            return;
+          }
 
-        if (enteredAnswer === correctAnswer.toString()) {
-          alert('Correct!');
+          if (enteredAnswer === correctAnswer.toString()) {
+            alert('Correct!');
+          } else {
+            alert('Incorrect. Please enter the correct answer.');
+          }
         } else {
-          alert('Incorrect. Please enter the correct answer.');
+          alert('MathQuill field not found.');
         }
       }
     }
