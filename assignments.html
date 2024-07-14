@@ -328,6 +328,9 @@
         var correctAnswer = correctAnswers[uniqueQuestionId];
         var selectedAnswer = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]:checked');
 
+        console.log(selectedAnswer)
+        console.log(correctAnswer)
+
         if (selectedAnswer) {
           var selectedAnswerValue = selectedAnswer.nextSibling.textContent.trim();
           if (selectedAnswerValue === correctAnswer.toString()) {
@@ -352,6 +355,9 @@
             alert('Error accessing the answer field.');
             return;
           }
+
+          console.log(enteredAnswer)
+          console.log(correctAnswer)
 
           if (enteredAnswer === correctAnswer.toString()) {
             alert('Correct!');
