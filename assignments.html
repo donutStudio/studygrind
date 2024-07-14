@@ -151,6 +151,11 @@
 
             textValue = replaceVariables(textValue, variables);
 
+            // Handle LaTeX rendering
+            textValue = textValue.replace(/\$(.*?)(?<! )\$/g, function(match, latexContent) {
+  return '<span class="mathquill-noneditable">' + latexContent.trim() + '</span>';
+});
+
             var uniqueQuestionId = i + '-' + (j - 1);
             var answerField = findAnswerField(sectionContent, j - 1);
             var answerHTML = generateAnswerHTML(answerField, variables, uniqueQuestionId);
@@ -180,22 +185,40 @@
     };
 
     function evaluateVariable(expression, variables) {
-      expression = expression.replace(/\s+/g, '');
+  expression = expression.replace(/\s+/g, '');
 
-      if (expression.startsWith('int.random[') && expression.endsWith(']')) {
-        var options = expression.substring(expression.indexOf('[') + 1, expression.lastIndexOf(']')).split(',');
-        options = options.map(option => parseInt(option.trim()));
-        var randomIndex = Math.floor(Math.random() * options.length);
-        return options[randomIndex];
+  if (expression.startsWith('int.random[') && expression.endsWith(']')) {
+    var options = expression.substring(expression.indexOf('[') + 1, expression.lastIndexOf(']')).split(',');
+    options = options.map(option => parseInt(option.trim()));
+    var randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex];
+  }
+  else if (expression.startsWith('int.random')) {
+    var args = expression.substring(expression.indexOf('(') + 1, expression.indexOf(')')).split(',');
+    var min = parseInt(args[0].trim());
+    var max = parseInt(args[1].trim());
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // Check if the expression contains variables in {}
+  if (expression.includes("{") && expression.includes("}")) {
+    expression = expression.replace(/\{(.*?)\}/g, function(match, variableName) {
+      var variableValue = variables[variableName.trim()];
+      if (variableValue !== undefined) {
+        return variableValue.toString(); // Replace with variable value
+      } else {
+        return match; // Return original placeholder if variable not found
       }
-      else if (expression.startsWith('int.random')) {
-        var args = expression.substring(expression.indexOf('(') + 1, expression.indexOf(')')).split(',');
-        var min = parseInt(args[0].trim());
-        var max = parseInt(args[1].trim());
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-      return expression;
-    }
+    });
+
+    // Recursively evaluate again in case there are nested variables
+    return evaluateVariable(expression, variables);
+  }
+
+  expression = evaluateAndSimplifyExpression(expression, variables);
+
+  return expression;
+}
 
     function replaceVariables(text, variables) {
       return text.replace(/\{(.*?)\}/g, function(match, variableName) {
@@ -217,27 +240,39 @@
     }
 
     function generateAnswerHTML(answerField, variables, uniqueQuestionId) {
-      var typeIndex = answerField.indexOf('type:');
-      var typeValue = answerField.substring(typeIndex + 5).trim();
+  var typeIndex = answerField.indexOf('type:');
+  var typeValue = answerField.substring(typeIndex + 5).trim();
 
-      if (typeValue.startsWith('short-answer')) {
-        return '<div class="mathquill-container"><span id="answer-' + uniqueQuestionId + '" class="mathquill-editable mq-editable-field"></span></div>';
-      } else if (typeValue.startsWith('multiple-choice')) {
-        var optionsStartIndex = typeValue.indexOf('[') + 1;
-        var optionsEndIndex = typeValue.indexOf(']');
-        var optionsString = typeValue.substring(optionsStartIndex, optionsEndIndex);
-        var options = optionsString.split(',').map(option => evaluateAndSimplifyExpression(option.trim(), variables));
+  if (typeValue.startsWith('short-answer')) {
+    return '<div class="mathquill-container"><span id="answer-' + uniqueQuestionId + '" class="mathquill-editable mq-editable-field"></span></div>';
+  } else if (typeValue.startsWith('multiple-choice')) {
+    var optionsStartIndex = typeValue.indexOf('[') + 1;
+    var optionsEndIndex = typeValue.indexOf(']');
+    var optionsString = typeValue.substring(optionsStartIndex, optionsEndIndex);
+    var options = optionsString.split(',');
 
-        var randomizeIndex = typeValue.indexOf('randomize=true');
-        if (randomizeIndex !== -1) {
-          options = shuffleArray(options);
-        }
-
-        var choicesHTML = options.map(option => '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>').join('<br>');
-        return '<div>' + choicesHTML + '</div>';
+    // Evaluate and simplify each option
+    options = options.map(option => {
+      option = option.trim();
+      if (option.startsWith('$') && option.endsWith('$')) {
+        // Content between $ signs should be rendered as LaTeX noneditable MathQuill field
+        var mathContent = option.substring(1, option.length - 1).trim();
+        return '<span class="mathquill-noneditable">' + mathContent + '</span>';
+      } else {
+        return evaluateAndSimplifyExpression(option, variables);
       }
-      return '';
+    });
+
+    var randomizeIndex = typeValue.indexOf('randomize=true');
+    if (randomizeIndex !== -1) {
+      options = shuffleArray(options);
     }
+
+    var choicesHTML = options.map(option => '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>').join('<br>');
+    return '<div>' + choicesHTML + '</div>';
+  }
+  return '';
+}
 
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -268,11 +303,14 @@
           handlers: {
             edit: function() {
               var enteredMath = mathField.latex();
-              console.log('Current LaTeX: ' + enteredMath);
             }
           }
         });
         mathFieldMap.set(field.id, mathField); // Store MathQuill instance in Map
+      });
+
+      document.querySelectorAll('.mathquill-noneditable').forEach(function(field) {
+        MQ.StaticMath(field);
       });
 
       document.querySelectorAll('button[id^="check-button-"]').forEach(function(button) {
@@ -305,8 +343,6 @@
         var mathField = mathFieldMap.get('answer-' + uniqueQuestionId); // Retrieve MathQuill instance from Map
 
         if (mathField) {
-          console.log('mathField:', mathField); // Debugging line
-          console.log('typeof mathField:', typeof mathField); // Debugging line
 
           var enteredAnswer;
           try {
