@@ -220,11 +220,13 @@
   return expression;
 }
 
-    function replaceVariables(text, variables) {
-      return text.replace(/\{(.*?)\}/g, function(match, variableName) {
-        return variables[variableName.trim()] || match;
-      });
-    }
+function replaceVariables(text, variables) {
+  return text.replace(/\{\{(.*?)\}\}/g, function(match, variableName) {
+    return '{' + (variables[variableName.trim()] || match) + '}';
+  }).replace(/\{(.*?)\}/g, function(match, variableName) {
+    return variables[variableName.trim()] || match;
+  });
+}
 
     function evaluateAndSimplifyExpression(expression, variables) {
       // Replace variables in the expression
@@ -234,7 +236,6 @@
       try {
         return math.evaluate(expression);
       } catch (error) {
-        console.error('Error evaluating expression:', error);
         return expression; // Return original expression on error
       }
     }
@@ -249,26 +250,32 @@
     var optionsStartIndex = typeValue.indexOf('[') + 1;
     var optionsEndIndex = typeValue.indexOf(']');
     var optionsString = typeValue.substring(optionsStartIndex, optionsEndIndex);
-    var options = optionsString.split(',');
-
-    // Evaluate and simplify each option
-    options = options.map(option => {
-      option = option.trim();
-      if (option.startsWith('$') && option.endsWith('$')) {
-        // Content between $ signs should be rendered as LaTeX noneditable MathQuill field
-        var mathContent = option.substring(1, option.length - 1).trim();
-        return '<span class="mathquill-noneditable">' + mathContent + '</span>';
-      } else {
-        return evaluateAndSimplifyExpression(option, variables);
-      }
-    });
+    var options = optionsString.split(',').map(option => evaluateAndSimplifyExpression(option.trim(), variables));
 
     var randomizeIndex = typeValue.indexOf('randomize=true');
     if (randomizeIndex !== -1) {
       options = shuffleArray(options);
     }
 
-    var choicesHTML = options.map(option => '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>').join('<br>');
+    var choicesHTML = options.map(option => {
+      // Ensure option is a string before splitting
+      if (typeof option === 'string') {
+        var rawAnswer = option;
+        var parts = option.split('$');
+        var renderedOption = parts.map((part, index) => {
+          if (index % 2 === 1) {
+            return '<span class="mathquill-noneditable">' + part + '</span>';
+          } else {
+            return part;
+          }
+        }).join('');
+        return '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + renderedOption + '</label>';
+      } else {
+        // Handle non-string options gracefully
+        return '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>';
+      }
+    }).join('<br>');
+
     return '<div>' + choicesHTML + '</div>';
   }
   return '';
@@ -328,11 +335,12 @@
         var correctAnswer = correctAnswers[uniqueQuestionId];
         var selectedAnswer = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]:checked');
 
-        console.log(selectedAnswer)
-        console.log(correctAnswer)
-
         if (selectedAnswer) {
           var selectedAnswerValue = selectedAnswer.nextSibling.textContent.trim();
+
+          console.log(selectedAnswerValue)
+          console.log(correctAnswer)
+
           if (selectedAnswerValue === correctAnswer.toString()) {
             alert('Correct!');
           } else {
@@ -346,6 +354,8 @@
         var mathField = mathFieldMap.get('answer-' + uniqueQuestionId); // Retrieve MathQuill instance from Map
 
         if (mathField) {
+          console.log('mathField:', mathField); // Debugging line
+          console.log('typeof mathField:', typeof mathField); // Debugging line
 
           var enteredAnswer;
           try {
@@ -355,9 +365,6 @@
             alert('Error accessing the answer field.');
             return;
           }
-
-          console.log(enteredAnswer)
-          console.log(correctAnswer)
 
           if (enteredAnswer === correctAnswer.toString()) {
             alert('Correct!');
