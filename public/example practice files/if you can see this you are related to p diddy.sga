@@ -1,0 +1,136 @@
+<page>
+
+<section>
+
+section-title: Pregenerated Questions
+
+<question>
+id: 0
+text: What is 3 + 6?
+correct-answer: 9
+</question>
+
+<answer-field>
+id: 0
+type: multiple-choice[3, 6, 9, 12]
+</answer-field>
+
+<check-question>
+id: 0
+</check-question>
+
+<question>
+id: 1
+text: Simplify $\sqrt{48}$
+correct-answer: $4\sqrt{3}$
+</question>
+
+<answer-field>
+id: 1
+type: multiple-choice[$4\sqrt{3}$, $3\sqrt{4}$, $8\sqrt{2}$, $4\sqrt{2}$],randomize=true
+</answer-field>
+
+<check-question>
+id: 1
+</check-question>
+
+</section>
+
+<section>
+
+section-title: Randomly Generated Numbers
+
+int Num1 = int.random(1, 100)
+int Num2 = int.random(1, 100)
+int Num3 = int.random[5, 9, 4]
+
+<question>
+id: 0
+text: Part A: What is {Num1} - {Num2}?
+correct-answer: {Num1} - {Num2}
+</question>
+
+<answer-field>
+id: 0
+type: math-text
+</answer-field>
+
+<check-question>
+id: 0
+</check-question>
+
+<question>
+id: 1
+text: Part B: What is {Num1} * {Num2} + {Num3}?
+correct-answer: {Num1} * {Num2} + {Num3}
+</question>
+
+<answer-field>
+id: 1
+type: multiple-choice[{Num1} + {Num2}, {Num1} * {Num2} + {Num3}, {Num1} - {Num2}, {Num1} / {Num2}],randomize=true
+</answer-field>
+
+<check-question>
+id: 1
+</check-question>
+
+</section>
+
+<section>
+
+section-title: Word Problems and Complex Answer Checking
+
+int Apples = int.random(6, 12)
+int Multiplier = int.random[2, 3, 5]
+int Pizza = int.random(3, 5)
+int TotalPizza = int.random[6, 8]
+int PizzaLeft = {TotalPizza}-{Pizza}
+
+<question>
+id: 0
+text: Baby Gronk has {Apples} apples and $x$ oranges. Blue Tie Kid has {Multiplier} times as many apples as Baby Gronk, but no oranges. They both have the same amount of fruits. How many oranges does Baby Gronk have?
+correct-answer: {Apples} * {Multiplier} - {Apples}
+</question>
+
+<answer-field>
+id: 0
+type: math-text
+</answer-field>
+
+<check-question>
+id: 0
+</check-question>
+
+<question>
+id: 1
+text: John ate $\frac{{Pizza}}{{TotalPizza}}$ of a pizza. How much pizza is left? (do not simplify fraction yet this can't detect fraction simplifications yet so for example do 2/8 instead of 1/4)
+correct-answer: \frac{{PizzaLeft}}{{TotalPizza}}
+</question>
+
+<answer-field>
+id: 1
+type: math-text
+</answer-field>
+
+<check-question>
+id: 1
+</check-question>
+
+<question>
+id: 2
+text: John has $100. Then he made $200 more. How much does he have?
+correct-answer: 300
+</question>
+
+<answer-field>
+id: 2
+type: math-text
+</answer-field>
+
+<check-question>
+id: 2
+</check-question>
+
+</section>
+
+</page>

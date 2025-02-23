@@ -1,0 +1,25 @@
+body {
+  background-color: rgb(234, 234, 234);
+  color: rgb(0, 0, 0);
+}
+.navbar {
+  background-color: rgb(0, 0, 0);
+}
+.navbar-dark .navbar-nav .nav-link {
+  color: rgb(253, 152, 0);
+}
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: rgb(142, 182, 220);
+}
+.navbar-dark .navbar-nav .active > .nav-link {
+  color: rgb(142, 182, 220) !important;
+}
+.navbar-dark .navbar-nav .nav-link:not(.active):hover {
+  color: rgb(142, 182, 220);
+}
+.jumbotron {
+  background-color: rgb(234, 234, 234);
+}
+.jumbotron h1, .jumbotron p {
+  color: rgb(253, 152, 0);
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - StudyGrind</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+    }
+
+    .navbar {
+      background-color: rgb(0, 0, 0);
+    }
+
+    .navbar-dark .navbar-nav .nav-link {
+      color: rgb(253, 152, 0);
+    }
+
+    .navbar-dark .navbar-nav .nav-link:hover {
+      color: rgb(255, 193, 99);
+    }
+
+    .jumbotron {
+      background-color: rgb(255, 255, 255);
+      padding: 2rem 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .jumbotron h1,
+    .jumbotron p {
+      color: rgb(253, 152, 0);
+    }
+
+    .placeholder-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .placeholder-content .text-section {
+      flex: 1;
+      text-align: justify;
+      margin-right: 2rem;
+      margin-left: 3rem;
+    }
+
+    .placeholder-content .image-section {
+      flex: 1;
+    }
+
+    .placeholder-content img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .placeholder-content h2 {
+      color: rgb(0, 0, 0);
+    }
+
+    .placeholder-content p {
+      font-size: 18px;
+    }
+
+    .title-section {
+      background-color: black;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+  <link rel="stylesheet" href="studygrind.css">
+</head>
+
+<body>
+
+  <div id="navbar-placeholder"></div>
+
+  <div class="title-section" style="height:250px;">
+    <h1 class="display-4">Welcome to<img src="assets/logo.svg"></h1>
+    <p class="lead">#1 place to study and grind</p>
+  </div>
+
+  <div class="container placeholder-content">
+    <div class="image-section">
+      <img src="assets/SkibDiddler.jpg" alt="Placeholder Image">
+    </div>
+
+    <div class="text-section">
+      <h2>Get that A on your next test</h2>
+      <p>StudyGrind offers various tools to practice for assessments. Sign up or log in to use our full host of advanced
+        features!</p>
+      <button class="button" onclick="openAuthWidget('signup')">Sign Up</button>
+      <button class="button" style="background-color:rgb(77, 77, 77);" onclick="openAuthWidget('login')">Log In</button>
+      <p style="font-size: 14px; margin-top: 10px; color:rgb(182, 182, 182);">Continue without account</p>
+    </div>
+  </div>
+
+  <div id="auth-widget" class="auth-widget-overlay">
+    <div class="auth-widget-content">
+      <div class="auth-widget-header">
+        <span class="auth-widget-close" onclick="closeAuthWidget()">&times;</span>
+      </div>
+      <h2 id="auth-widget-title">Log In</h2>
+      <form id="auth-widget-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter your password">
+        </div>
+        <button type="submit" class="button">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="login_modal.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+      if (isLoggedIn) {
+        window.location.href = "/explore.html";
+      }
+    });
+  </script>
+
+</body>
+
+</html>

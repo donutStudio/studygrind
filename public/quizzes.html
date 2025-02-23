@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practice - StudyGrind</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: rgb(234, 234, 234);
+      color: rgb(0, 0, 0);
+    }
+    .navbar {
+      background-color: rgb(0, 0, 0);
+    }
+    .navbar-dark .navbar-nav .nav-link {
+      color: rgb(20, 112, 175);
+    }
+    .navbar-dark .navbar-nav .nav-link:hover {
+      color: rgb(142, 182, 220);
+    }
+    .jumbotron {
+      background-color: rgb(234, 234, 234);
+    }
+    .jumbotron h1, .jumbotron p {
+      color: rgb(20, 112, 175);
+    }
+    .mq-editable-field {
+      border: 0.5px solid #ccc;
+      padding: 5px;
+      min-height: 40px;
+    }
+    .mathquill-container {
+      margin-top: 15px;
+      margin-bottom: 0px;
+    }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  input[type="radio"] + label {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 20px;
+    font-size: 18px;
+    user-select: none;
+  }
+
+  input[type="radio"] + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    background-color: #fff;
+  }
+
+  input[type="radio"]:checked + label:before {
+    border-color: #3ea2ff;
+    background-color: #3ea2ff;
+  }
+
+  input[type="radio"]:checked + label:after {
+    content: '';
+    position: absolute;
+    left: 5.5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #fff;
+  }
+  </style>
+
+  <link rel="stylesheet" href="./mathquill.css"/>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+  <section id="lessons" class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <h2>Upload Quiz File</h2>
+          <input type="file" id="file" accept=".sga">
+          <div id="output" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assignment_parser.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+  <script src="./mathquill.js"></script>
+  <script src="navbar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.6.0/math.min.js"></script>
+</body>
+</html>
